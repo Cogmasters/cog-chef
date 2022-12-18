@@ -1,0 +1,14 @@
+# Ignore all
+*
+# But these
+!.gitignore
+!README.md
+!recipes
+!recipes/*
+!recipes/**/*
+!cogchef*
+!Makefile
+!test
+!test/*
+!docs
+!docs/*
