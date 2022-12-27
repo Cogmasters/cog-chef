@@ -2,7 +2,7 @@
 EXTEND  = cogchef-default.PRE.h
 API_DIR = api
 OUT     = out
-DFLAGS  = -DCOGCHEF_STRUCT_INIT -DCOGCHEF_JSON_ENCODER -DCOGCHEF_JSON_DECODER
+DFLAGS  = -DCOGCHEF_HELPER -DCOGCHEF_STRUCT_INIT -DCOGCHEF_JSON_ENCODER -DCOGCHEF_JSON_DECODER
 
 # Remove suffix from EXTEND
 EXTEND_NO_EXT_EXPAND = "$$(echo $(EXTEND) | sed -e 's/\.PRE\.h//')"
@@ -17,6 +17,11 @@ BUILD = $(MAKE) EXTEND_NO_EXT=$(EXTEND_NO_EXT_EXPAND) OUT_NO_EXT=$(OUT) DFLAGS="
 all:
 	@ touch $(TEMPFILE) && $(TEMPFILE_EXPAND)
 	@ $(BUILD) TEMPFILE=$(TEMPFILE) || rm -f $(TEMPFILE)
+	@ rm -f $(TEMPFILE)
+
+debug:
+	@ echo "Building on debug mode"
+	@ CFLAGS="-g" $(MAKE)
 
 headers:
 	@ $(BUILD) HEADERS=$(HEADERS_EXPAND) $@

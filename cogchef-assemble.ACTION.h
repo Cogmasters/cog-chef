@@ -1,4 +1,4 @@
-#define __BLANK
+#define BLANK
 
 #ifndef COGCHEF_COND_WRITE
 #   define COGCHEF_COND_WRITE(_condition)
@@ -14,23 +14,20 @@
 #   define COGCHEF_STRUCT_private(_type)
 #endif
 #ifndef COGCHEF_FIELD_CUSTOM
-#   define COGCHEF_FIELD_CUSTOM(_name, _key, _type, _decor, _func,            \
-                                _default_value)
+#   define COGCHEF_FIELD_CUSTOM(_name, _type, _decor, _func, _default_value)
 #endif
 #ifndef COGCHEF_FIELD
 #   define COGCHEF_FIELD(_name, _type, _default_value)                        \
-        COGCHEF_FIELD_CUSTOM(_name, #_name, _type, __BLANK, COGCHEF_##_type,  \
+        COGCHEF_FIELD_CUSTOM(_name, _type, BLANK, COGCHEF_##_type,            \
                              _default_value)
 #endif
 #ifndef COGCHEF_FIELD_STRUCT_PTR
 #   define COGCHEF_FIELD_STRUCT_PTR(_name, _type, _decor)                     \
-        COGCHEF_FIELD_CUSTOM(_name, #_name, _type, _decor,                    \
-                             COGCHEF_STRUCT_PTR, NULL)
+        COGCHEF_FIELD_CUSTOM(_name, _type, _decor, COGCHEF_STRUCT_PTR, NULL)
 #endif
 #ifndef COGCHEF_FIELD_PTR
 #   define COGCHEF_FIELD_PTR(_name, _type, _decor)                            \
-        COGCHEF_FIELD_CUSTOM(_name, #_name, _type, _decor,                    \
-                             COGCHEF_PTR_##_type, NULL)
+        COGCHEF_FIELD_CUSTOM(_name, _type, _decor, COGCHEF_PTR_##_type, NULL)
 #endif
 #ifndef COGCHEF_FIELD_PRINTF
 #   define COGCHEF_FIELD_PRINTF(_name, _type, _printf_type, _scanf_type)
@@ -48,14 +45,14 @@
 #ifndef COGCHEF_LIST_private
 #   define COGCHEF_LIST_private(_type)
 #endif
-#ifndef COGCHEF_LISTTYPE
-#   define COGCHEF_LISTTYPE(_type)
+#ifndef COGCHEF_ELEMENT
+#   define COGCHEF_ELEMENT(_type)
 #endif
-#ifndef COGCHEF_LISTTYPE_STRUCT
-#   define COGCHEF_LISTTYPE_STRUCT(_type)
+#ifndef COGCHEF_ELEMENT_STRUCT
+#   define COGCHEF_ELEMENT_STRUCT(_type)
 #endif
-#ifndef COGCHEF_LISTTYPE_PTR
-#   define COGCHEF_LISTTYPE_PTR(_type, _decor)
+#ifndef COGCHEF_ELEMENT_PTR
+#   define COGCHEF_ELEMENT_PTR(_type, _decor)
 #endif
 #ifndef COGCHEF_LIST_END
 #   define COGCHEF_LIST_END
@@ -94,9 +91,9 @@
 
 #undef COGCHEF_LIST_public
 #undef COGCHEF_LIST_private
-#undef COGCHEF_LISTTYPE
-#undef COGCHEF_LISTTYPE_STRUCT
-#undef COGCHEF_LISTTYPE_PTR
+#undef COGCHEF_ELEMENT
+#undef COGCHEF_ELEMENT_STRUCT
+#undef COGCHEF_ELEMENT_PTR
 #undef COGCHEF_LIST_END
 
 #undef COGCHEF_ENUM

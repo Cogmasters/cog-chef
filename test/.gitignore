@@ -1,0 +1,9 @@
+# Ignore all
+*
+# But these
+!.gitignore
+!Makefile
+!api
+!api/*.PRE.h
+!*.h
+!*.c

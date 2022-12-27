@@ -3,6 +3,7 @@
 #else
 #   include "cogchef.h"
 #   include "recipes/definitions/main.h"
+#   include "recipes/helper/main.h"
 #   include "recipes/struct-init/main.h"
 #   include "recipes/json-decoder/main.h"
 #   include "recipes/json-encoder/main.h"

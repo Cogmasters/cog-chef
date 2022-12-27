@@ -11,3 +11,7 @@ STRUCT_END
 STRUCT(public, baz)
     FIELD_STRUCT_PTR(data, bar, *)
 STRUCT_END
+
+LIST(public, bazz)
+    ELEMENT_PTR(char, *)
+LIST_END
