@@ -10,5 +10,8 @@
 !Makefile
 !test
 !test/*
+!test/**/*
+!utils
+!utils/*
 !docs
 !docs/*

@@ -39,17 +39,16 @@
                             struct _type *self);                              \
     size_t _type##_from_json(const char buf[], size_t size,                   \
                              struct _type *self);
-#define COGCHEF_LIST_public(_type) COGCHEF_STRUCT_public(_type)
+#define COGCHEF_LIST_public COGCHEF_STRUCT_public
 
 #include "cogchef-assemble.ACTION.h"
 
 #elif defined(COGCHEF_FORWARD)
-/*#! #include "carray.h" */
 
 #define COGCHEF_STRUCT_private(_type)                                         \
     static long _type##_from_jsmnf(jsmnf_pair *root, const char *js,          \
                                    struct _type *self);
-#define COGCHEF_LIST_private(_type) COGCHEF_STRUCT_private(_type)
+#define COGCHEF_LIST_private COGCHEF_STRUCT_private
 
 #include "cogchef-assemble.ACTION.h"
 
@@ -71,11 +70,8 @@ _cc_strndup(const char *src, size_t len)
     {                                                                         \
         jsmnf_pair *f;                                                        \
         long ret = 0;
-#define COGCHEF_STRUCT_private(_type)                                         \
-    static COGCHEF_STRUCT_public(_type)
-#define COGCHEF_FIELD_CUSTOM(_name, _key, _type, _decor, _decoder,            \
-                             _default_value)                                  \
-        f = jsmnf_find(root, js, _key, sizeof(_key) - 1);                     \
+#define COGCHEF_FIELD_CUSTOM(_name, _type, _decor, _decoder, _default_value)  \
+        f = jsmnf_find(root, js, #_name, sizeof(#_name) - 1);                 \
         _decoder(f, js, self->_name, _type);
 #define COGCHEF_FIELD_PRINTF(_name, _type, _printf_type, _scanf_type)         \
         f = jsmnf_find(root, js, #_name, sizeof(#_name) - 1);                 \
@@ -83,6 +79,20 @@ _cc_strndup(const char *src, size_t len)
 #define COGCHEF_STRUCT_END                                                    \
         return ret;                                                           \
     }
+#define COGCHEF_STRUCT_private static COGCHEF_STRUCT_public
+
+#define ARRAY_INSERT(i, value)                                                \
+    if (self->size == self->realsize) {                                       \
+        void *tmp;                                                            \
+        self->realsize = 1 + self->realsize * 2;                              \
+        tmp = realloc(self->array, sizeof *self->array * self->realsize);     \
+        if (!tmp) return NULL;                                                \
+        self->array = tmp;                                                    \
+    }                                                                         \
+    memmove(self->array + i + 1, self->array + i,                             \
+            sizeof *self->array * (self->size - i));                          \
+    self->array[i] = value;                                                   \
+    self->size++
 
 #define COGCHEF_LIST_public(_type)                                            \
     long _type##_from_jsmnf(jsmnf_pair *root, const char *js,                 \
@@ -90,39 +100,29 @@ _cc_strndup(const char *src, size_t len)
     {                                                                         \
         long ret = sizeof *self * root->size;                                 \
         int i;                                                                \
-        if (!ret) return 0;
-#define COGCHEF_LIST_private(_type)                                           \
-    static COGCHEF_LIST_public(_type)
-#define COGCHEF_LISTTYPE(_type)                                               \
-        __carray_init(self, root->size, _type, , );                           \
+        if (!ret) return 0;                                                   \
+        self->array = calloc((self->realsize = root->size), sizeof *self);    \
+        if (!self->array) return 0;                                           \
+        self->size = 0;                                                       \
         for (i = 0; i < root->size; ++i) {                                    \
-            jsmnf_pair *f = root->fields + i;                                 \
+            jsmnf_pair *f = root->fields + i;
+#define COGCHEF_ELEMENT(_type)                                                \
             _type o;                                                          \
-            COGCHEF_##_type(f, js, o, _type);                                 \
-            carray_insert(self, i, o);                                        \
-        }
-
-#define COGCHEF_LISTTYPE_STRUCT(_type)                                        \
-        __carray_init(self, root->size, struct _type, , );                    \
-        for (i = 0; i < root->size; ++i) {                                    \
-            jsmnf_pair *f = root->fields + i;                                 \
+            COGCHEF_##_type(f, js, o, _type);
+#define COGCHEF_ELEMENT_STRUCT(_type)                                         \
             struct _type o = { 0 };                                           \
             long _ret = _type##_from_jsmnf(f, js, &o);                        \
             if (_ret < 0) return _ret;                                        \
-            ret += _ret;                                                      \
-            carray_insert(self, i, o);                                        \
-        }
-#define COGCHEF_LISTTYPE_PTR(_type, _decor)                                   \
-        __carray_init(self, root->size, _type _decor, , );                    \
-        for (i = 0; i < root->size; ++i) {                                    \
-            jsmnf_pair *f = root->fields + i;                                 \
+            ret += _ret;
+#define COGCHEF_ELEMENT_PTR(_type, _decor)                                    \
             _type *o;                                                         \
-            COGCHEF_PTR_##_type(f, js, o, _type);                             \
-            carray_insert(self, i, o);                                        \
-        }
+            COGCHEF_PTR_##_type(f, js, o, _type);
 #define COGCHEF_LIST_END                                                      \
+            ARRAY_INSERT(i, o);                                               \
+        }                                                                     \
         return ret;                                                           \
     }
+#define COGCHEF_LIST_private static COGCHEF_LIST_public
 
 #include "cogchef-assemble.ACTION.h"
 
@@ -151,7 +151,7 @@ _cc_strndup(const char *src, size_t len)
         }                                                                     \
         return nbytes;                                                        \
     }
-#define COGCHEF_LIST_public(_type) COGCHEF_STRUCT_public(_type)
+#define COGCHEF_LIST_public COGCHEF_STRUCT_public
 
 #include "cogchef-assemble.ACTION.h"
 

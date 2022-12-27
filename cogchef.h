@@ -6,7 +6,9 @@
 #define COGCHEF_LIST(_visibility, _name)                                      \
     COGCHEF_LIST_ ## _visibility(_name)
 
-/* Allow symbols usage without COGCHEF_ prefix */
+#if 0
+The following allows symbols usage without COGCHEF_ prefix
+#endif
 #ifndef COGCHEF_USE_PREFIX
 #   define COND_WRITE COGCHEF_COND_WRITE
 #   define COND_END COGCHEF_COND_END
@@ -21,9 +23,9 @@
 #   define STRUCT_END COGCHEF_STRUCT_END
 
 #   define LIST COGCHEF_LIST
-#   define LISTTYPE COGCHEF_LISTTYPE
-#   define LISTTYPE_STRUCT COGCHEF_LISTTYPE_STRUCT
-#   define LISTTYPE_PTR COGCHEF_LISTTYPE_PTR
+#   define ELEMENT COGCHEF_ELEMENT
+#   define ELEMENT_STRUCT COGCHEF_ELEMENT_STRUCT
+#   define ELEMENT_PTR COGCHEF_ELEMENT_PTR
 #   define LIST_END COGCHEF_LIST_END
 
 #   define ENUM COGCHEF_ENUM

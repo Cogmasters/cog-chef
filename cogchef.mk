@@ -6,7 +6,7 @@ OUT_H  = $(OUT_NO_EXT).h
 OUT_O  = $(OUT_NO_EXT).o
 
 CFLAGS   ?= -O2
-CFLAGS   += -I.
+CFLAGS   += -I. -Wall -Wextra -Wpedantic -std=c89
 CPP       = cc -E # If you run into issues, try changing this to 'cpp'
 CPPFLAGS += -nostdinc -P -CC
 
