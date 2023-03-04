@@ -1,3 +1,6 @@
+# CogChef post-preprocessor executable that runs after CPP expansion
+POST_EXPAND = cogchef-post_expand
+
 # Input file to be preprocessed
 EXTEND = $(EXTEND_NO_EXT).PRE.h
 # Resulting single-file amalgamations after preprocessing input file
@@ -15,39 +18,39 @@ CPPFLAGS += -nostdinc -P -CC
 HEADER_TAG_EXPAND   = "$$(echo '$<' | sed -e 's/\(.*\)\.PRE.h/\1/' | sed -e 's/\//_/g' | sed -e 's/-/_/g' | tr '[:lower:]' '[:upper:]')_H"
 # Doxygen file description
 DOXYGEN_DESC_EXPAND = "/**\n * @file $@\n * @author CogChef\n * @brief CogChef generated code\n */\n"
-# CogChef post-preprocessor that runs after CPP expansion
-# TODO: join these sed expressions together (see https://unix.stackexchange.com/a/145409)
-POST_EXPAND         = sed -e 's/\/\*\#\! \(.*\)\*\//\1/g'
 
 all: $(OUT_O)
 
+$(POST_EXPAND):
+	$(CC) $(CFLAGS) $@.c -o $@
+
 $(OUT_O): $(OUT_C) $(OUT_H)
 	$(CC) -c $(CFLAGS) $< -o $@
-$(OUT_H): $(TEMPFILE) $(EXTEND)
+$(OUT_H): $(TEMPFILE) $(EXTEND) $(POST_EXPAND)
 	@ echo "Generating header"
 	@ echo "#ifndef $(HEADER_TAG_EXPAND)" > $@
 	@ echo "#define $(HEADER_TAG_EXPAND)\n" >> $@
-	$(CPP) $(CFLAGS) -DCOGCHEF_DEFINITIONS -DCOGCHEF_ENTRY=\"$<\" $(CPPFLAGS) $(EXTEND) | $(POST_EXPAND) >> $@
-	$(CPP) $(CFLAGS) $(DFLAGS) -DCOGCHEF_HEADER -DCOGCHEF_ENTRY=\"$<\" $(CPPFLAGS) $(EXTEND) | $(POST_EXPAND) >> $@
+	$(CPP) $(CFLAGS) -DCOGCHEF_DEFINITIONS -DCOGCHEF_ENTRY=\"$<\" $(CPPFLAGS) $(EXTEND) | ./$(POST_EXPAND) >> $@
+	$(CPP) $(CFLAGS) $(DFLAGS) -DCOGCHEF_HEADER -DCOGCHEF_ENTRY=\"$<\" $(CPPFLAGS) $(EXTEND) | ./$(POST_EXPAND) >> $@
 	@ echo "\n#endif /* $(HEADER_TAG_EXPAND) */" >> $@
-$(OUT_C): $(TEMPFILE) $(EXTEND)
+$(OUT_C): $(TEMPFILE) $(EXTEND) $(POST_EXPAND)
 	@ echo "Generating forward definitions"
 	@ echo "#include \"$(OUT_H)\"" > $@
-	$(CPP) $(CFLAGS) $(DFLAGS) -DCOGCHEF_FORWARD -DCOGCHEF_ENTRY=\"$<\" $(CPPFLAGS) $(EXTEND) | $(POST_EXPAND) >> $@
+	$(CPP) $(CFLAGS) $(DFLAGS) -DCOGCHEF_FORWARD -DCOGCHEF_ENTRY=\"$<\" $(CPPFLAGS) $(EXTEND) | ./$(POST_EXPAND) >> $@
 	@ echo "Generating source"	
 	$(CPP) $(CFLAGS) $(DFLAGS) -DCOGCHEF_ENTRY=\"$<\" $(CPPFLAGS) $(EXTEND) >> $@
 
 headers: $(HEADERS)
 
-$(HEADERS): $(EXTEND)
+$(HEADERS): $(EXTEND) $(POST_EXPAND)
 
 .SUFFIXES: .PRE.h .h
 .PRE.h.h:
 	@ echo $(DOXYGEN_DESC_EXPAND) > $@
 	@ echo "#ifndef $(HEADER_TAG_EXPAND)" >> $@
 	@ echo "#define $(HEADER_TAG_EXPAND)\n" >> $@
-	$(CPP) $(CFLAGS) -DCOGCHEF_DEFINITIONS -DCOGCHEF_ENTRY=\"$<\" $(CPPFLAGS) $(EXTEND) | $(POST_EXPAND) >> $@
-	$(CPP) $(CFLAGS) $(DFLAGS) -DCOGCHEF_HEADER -DCOGCHEF_ENTRY=\"$<\" $(CPPFLAGS) $(EXTEND) | $(POST_EXPAND) >> $@
+	$(CPP) $(CFLAGS) -DCOGCHEF_DEFINITIONS -DCOGCHEF_ENTRY=\"$<\" $(CPPFLAGS) $(EXTEND) | ./$(POST_EXPAND) >> $@
+	$(CPP) $(CFLAGS) $(DFLAGS) -DCOGCHEF_HEADER -DCOGCHEF_ENTRY=\"$<\" $(CPPFLAGS) $(EXTEND) | ./$(POST_EXPAND) >> $@
 	@ echo "\n#endif /* $(HEADER_TAG_EXPAND) */" >> $@
 
 echo:
@@ -58,6 +61,6 @@ echo:
 	@ echo 'HEADERS: $(HEADERS)'
 
 clean:
-	@ rm -f $(OUT_H) $(OUT_C) $(OUT_O) $(HEADERS)
+	@ rm -f $(OUT_H) $(OUT_C) $(OUT_O) $(HEADERS) $(POST_EXPAND)
 
 .PHONY: headers clean

@@ -1,10 +1,11 @@
 #define HELPER
-#define COGCHEF_RETURN(_type) void
 
 #ifdef COGCHEF_HELPER
 #ifdef COGCHEF_HEADER
 
 /*#! #include "utils/tablec.h" */
+
+enum cogchef_modes { COGCHEF_MODES_WRITE, COGCHEF_MODES_READONLY };
 
 enum cogchef_types {
     COGCHEF_TYPES__char,
@@ -40,9 +41,15 @@ struct cogchef {
     size_t size;
     size_t nfields;
     struct tablec_ht fields;
+    enum cogchef_modes mode;
 };
 
-/*#! #define cogchef_get(cogchef, key) tablec_get(&cogchef->fields, key) */
+/*#!
+#define cogchef_get(cogchef, key) tablec_get(&cogchef->fields, key)
+#define cogchef_set(cogchef, key, value)                                      \
+    ((cogchef->mode & COGCHEF_MODES_WRITE)                                    \
+        ? tablec_set(&cogchef->fields, key, value) : (abort(), NULL))
+*/
 
 #define COGCHEF_STRUCT_public(_type)                                          \
     struct cogchef *cogchef_from_##_type(struct _type *self,                  \
@@ -89,19 +96,20 @@ struct cogchef {
 
 #define COGCHEF_STRUCT_public(_type)                                          \
     struct cogchef *                                                          \
-    cogchef_from_##_type(struct _type *self, struct cogchef *saveptr)         \
+    cogchef_from_##_type(                                                     \
+        struct _type *self, enum cogchef_modes mode, struct cogchef *saveptr) \
     {                                                                         \
         struct cogchef_field *fields;                                         \
         if (!saveptr && !(saveptr = malloc(sizeof *saveptr))) return NULL;    \
         saveptr->size = sizeof *self;                                         \
-        saveptr->nfields =                                                    \
-            sizeof(_type##__fields) / sizeof *_type##__fields;                \
+        saveptr->nfields = sizeof(_type##__fields) / sizeof *_type##__fields; \
         fields = malloc(sizeof(_type##__fields));                             \
         memcpy(fields, _type##__fields, sizeof(_type##__fields));
 #define COGCHEF_FIELD_CUSTOM(_name, _type, _decor, _func, _default_value)     \
         tablec_set(&saveptr->fields, #_name,                                  \
                    ((fields->value = &self->_name), fields++));
 #define COGCHEF_STRUCT_END                                                    \
+        saveptr->mode = mode;                                                 \
         return saveptr;                                                       \
     }
 #define COGCHEF_STRUCT_private static COGCHEF_STRUCT_public
@@ -112,4 +120,3 @@ struct cogchef {
 #endif /* COGCHEF_HELPER */
 
 #undef HELPER
-#undef COGCHEF_RETURN
