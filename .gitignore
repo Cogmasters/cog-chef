@@ -3,12 +3,15 @@
 # But these
 !.gitignore
 !README.md
+!KNOWN_BUGS.md
+!licenses
+!licenses/LICENSE*
 !recipes
 !recipes/*
 !recipes/**/*
-!cogchef*
+!cogchef*.*
 !Makefile
 !test
-!test/*
+!utils
 !docs
 !docs/*

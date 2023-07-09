@@ -14,8 +14,7 @@
         struct _type _decor _name;
 #define COGCHEF_FIELD_PTR(_name, _type, _decor)                               \
         _type _decor _name;
-#define COGCHEF_FIELD_CUSTOM(_name, _key, _type, _decor, _func,               \
-                             _default_value)                                  \
+#define COGCHEF_FIELD_CUSTOM(_name, __type, _decor, _func, _default_value)    \
         _type _decor _name;
 #define COGCHEF_FIELD_PRINTF(_name, _type, printf_type, _scanf_type)          \
         _type _name;
@@ -27,17 +26,17 @@
 #define COGCHEF_LIST_private(_type)                                           \
     struct _type {                                                            \
         int size;
-#define COGCHEF_LISTTYPE(_type)                                               \
+#define COGCHEF_ELEMENT(_type)                                                \
         _type *array;
-#define COGCHEF_LISTTYPE_STRUCT(_type)                                        \
+#define COGCHEF_ELEMENT_STRUCT(_type)                                         \
         struct _type *array;
-#define COGCHEF_LISTTYPE_PTR(_type, _decor)                                   \
+#define COGCHEF_ELEMENT_PTR(_type, _decor)                                    \
         _type * _decor array;
 #define COGCHEF_LIST_END                                                      \
         /** @private */                                                       \
         int realsize;                                                         \
     };
-#define COGCHEF_LIST_public(_type) COGCHEF_LIST_private(_type)
+#define COGCHEF_LIST_public COGCHEF_LIST_private
 
 #define COGCHEF_ENUM(_name)                                                   \
     enum _name {
@@ -48,8 +47,8 @@
 #define COGCHEF_ENUM_END                                                      \
     };
 
-#define COGCHEF_STRUCT_public(_type) COGCHEF_STRUCT_private(_type)
-#define COGCHEF_LIST_public(_type) COGCHEF_LIST_private(_type)
+#define COGCHEF_STRUCT_public COGCHEF_STRUCT_private
+#define COGCHEF_LIST_public COGCHEF_LIST_private
 
 #include "cogchef-assemble.ACTION.h"
 
